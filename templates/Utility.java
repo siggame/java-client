@@ -2,7 +2,7 @@ import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 
-public class NetworkUtility
+public class Utility
 {
   public static int verbosity = 0;
   
