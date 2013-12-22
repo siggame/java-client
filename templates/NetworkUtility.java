@@ -4,9 +4,9 @@ import java.nio.ByteBuffer;
 
 public class NetworkUtility
 {
-  static int verbosity = 0;
+  public static int verbosity = 0;
   
-  public String receive_string(Socket conn)
+  public static String receive_string(Socket conn)
   {
     //read 4 bytes into length
     byte[] length_data = byte[4];
@@ -22,7 +22,7 @@ public class NetworkUtility
     return message;
   }
   
-  public void send_string(Socket conn, String message)
+  public static void send_string(Socket conn, String message)
   {
     vv_print("Sending: " + message);
     //encode message
@@ -36,7 +36,7 @@ public class NetworkUtility
     conn.getOutputStream().write(sent_data);
   }
   
-  public void vv_print(String message)
+  public static void vv_print(String message)
   {
     if (verbosity > 1)
     {
@@ -44,7 +44,7 @@ public class NetworkUtility
     }
   }
   
-  public void v_print(String message)
+  public static void v_print(String message)
   {
     if (verbosity >= 1)
     {
