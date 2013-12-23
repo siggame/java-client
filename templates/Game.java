@@ -155,9 +155,16 @@ public class Game
     JSONObject result = wait_for(["success","failure"]);
     if (result.getString("type").equals("success"))
     {
-      PrintWriter gamelog = new PrintWriter(game_name+".glog","UTF-8");
-      gamelog.out.print(result.getJSONObject("args").getString("log"));
-      gamelog.close();
+      try
+      {
+        PrintWriter gamelog = new PrintWriter(game_name+".glog","UTF-8");
+        gamelog.out.print(result.getJSONObject("args").getString("log"));
+        gamelog.close();
+      }
+      catch (Exception e)
+      {
+        System.out.println("There was a problem creating a gamelog");
+      }
     }
   }
   
@@ -189,6 +196,117 @@ public class Game
         change_global_update(change);
       }
     }
+    return true;
+  }
+  
+  public boolean change_add (JSONObject change)
+  {
+    JSONObject values = change.getJSONObject("values");
+    if (false) {} //So we can do an easy "else if" chain
+% for model in models:
+% if model.type == "Model":
+    else if(change.getString("type").equals("${model.name}"))
+    {
+      ${model.name} newObject = new ${model.name}(serv_conn,this\
+% for datum in model.data:
+, values.get${type_convert(datum.type)}("${datum.name}")\
+% endfor
+);
+      ai.${lowercase(model.plural)}.add(newObject);
+    }
+% endif
+% endfor
+    else
+    {
+        System.out.println("Attempted to add unknown model");
+    }
+    return true;
+  }
+  
+   public boolean change_remove (JSONObject change)
+  { 
+    int remove_id = change.getInt("id");
+    
+% for model in models:
+% if model.type == "Model":
+    for (int i = 0; i < ai.${lowercase(model.plural)}.size(); i++)
+    {
+      if (ai.${lowercase(model.plural)}.get(i).id == change_id)
+      {
+        ai.${lowercase(model.plural)}.remove(i);
+        return true;
+      }
+    }
+% endif
+% endfor
+    return false;
+  }
+  
+  public boolean change_update (JSONObject change)
+  {
+    int change_id = change.getInt("id");
+
+% for model in models:
+% if model.type == "Model":
+    for (int i = 0; i < ai.${lowercase(model.plural)}.size(); i++)
+    {
+        if(ai.${lowercase(model.plural)}.get(i).id == change_id)
+        {
+% for datum in model.data:
+          if(change.getJSONObject("changes").has("${datum.name}"))
+          {
+            ai.${lowercase(model.plural)}.get(i).${datum.name} = change.getJSONObject("changes").get${type_convert(datum.type)}("${datum.name}");
+          }
+% endfor
+          return true;
+        }
+    }
+% endif
+% endfor
+    return false;
+  }
+  
+  public boolean change_global_update (JSONObject change)
+  {
+% for datum in globals:
+    if(change.getJSONObject("values").has("${datum.name}"))
+    {
+      ai.${datum.name} = change.getJSONObject("values").get${type_convert(datum.type)}("${datum.name}");
+    }
+% endfor
+    return true;
+  }
+  
+  public boolean run ()
+  {
+    String game_over_message;
+    if (! login())
+      return false;
+    if (! join_game())
+      return false;
+      
+    recv_player_id();
+    init_main();
+    
+    try
+    {
+      main_loop();
+    }
+    catch (GameOverException e)
+    {
+      if (e.winner == ai.my_player_id)
+      {
+        game_over_message = "You Win! - " + e.reason;
+      }
+      else
+      {
+        game_over_message = "You Lose! - " + e.reason;
+      }
+    }
+    
+    end_main();
+    System.out.println(game_over_message);
+    get_log();
     return true;
   }
 }
