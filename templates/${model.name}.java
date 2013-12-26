@@ -16,8 +16,8 @@ public class ${model.name} inherits ${model.parent.name}
 % else:
 public class ${model.name} inherits GameObject
 {
-% for datum in model.data:
-  ${type_convert_java_type(datum.type)} _${datum.name};
+% for local in model.locals:
+  private ${type_convert_java_type(local.type)} _${local.name};
 % endfor
 
   public ${model.name} (Socket connection, Game parent_game\
@@ -51,7 +51,7 @@ public class ${model.name} inherits GameObject
     JSONObject function_call = Utility.function_call_json();
 
 % for args in func.arguments:
-    function_call.getJSONObject("args").put(${repr(args.name)}, ${args.name});
+    function_call.getJSONObject("args").put("${repr(args.name)}", ${args.name});
 % endfor
     Utility.send_string(_connection, function_call.toString());
 
@@ -79,4 +79,27 @@ public class ${model.name} inherits GameObject
     return status;
 % endfor
   }
+
+% for local in model.locals:
+% if local.through:
+  public ${type_convert_java_type(local.type)} ${local.name} ()
+  {
+    return _${local.through}.${local.name}();
+  }
+% else:
+  public ${type_convert_java_type(local.type)} ${local.name} ()
+  {
+    return _${local.name};
+  }
+% endif
+% endfor
+% for remote in model.remotes:
+  public ${remote.name} ${remote.name} ()
+  {
+    for (int i = 0; i < parent_game.ai.${lowercase(remote.plural)}.size(), i++)
+      if (parent_game.ai.${lowercase(remote.plural)}.get(i).id == ${remote.name}_id)
+      {
+        return parent_game.ai.${lowercase(remote.plural)}.get(i);
+      }
+% endfor
 }
