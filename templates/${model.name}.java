@@ -75,7 +75,7 @@ public class ${model.name} inherits GameObject
       {
         _parent_game.update_game(message);
       }
-    {
+    }
     return status;
 % endfor
   }
