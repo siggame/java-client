@@ -51,5 +51,45 @@ public class Utility
       System.out.println(message);
     }
   }
+  
+  public static JSONObject login_json (String username)
+  {
+    JSONObject json = new JSONObject();
+    json.put("type","login");
+    JSONObject args = new JSONObject();
+    args.put("username",username);
+    args.put("connection_type", "${repr(name)}");
+    json.put("args",args);
+    return json;
+  }
+  
+  public static JSONObject join_game_json ()
+  {
+    JSONObject json = new JSONObject();
+    json.put("type","join_game");
+    JSONObject args = new JSONObject();
+    if (game_name != null)
+    {
+      args.put("game_name", game_name);
+    }
+    json.put("args",args);
+    return json;
+  }
+  public static JSONObject end_turn_json ()
+  {
+    JSONObject json = new JSONObject();
+    json.put("type","end_turn");
+    JSONObject args = new JSONObject();
+    json.put("args",args);
+    return json;
+  }
+  public static JSONObject get_log_json ()
+  {
+    JSONObject json = new JSONObject();
+    json.put("type"," get_log");
+    JSONObject args = new JSONObject();
+    json.put("args",args);
+    return json;
+  }
 
 }

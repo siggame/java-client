@@ -17,46 +17,6 @@ public class Game
     //Don't know about this passing the connection to the ai business in the python template
   }
   
-  private JSONObject login_json (String username)
-  {
-    JSONObject json = new JSONObject();
-    json.put("type","login");
-    JSONObject args = new JSONObject();
-    args.put("username",username);
-    args.put("connection_type", "${repr(name)}");
-    json.put("args",args);
-    return json;
-  }
-  
-  private JSONObject join_game_json ()
-  {
-    JSONObject json = new JSONObject();
-    json.put("type","join_game");
-    JSONObject args = new JSONObject();
-    if (game_name != null)
-    {
-      args.put("game_name", game_name);
-    }
-    json.put("args",args);
-    return json;
-  }
-  private JSONObject end_turn_json ()
-  {
-    JSONObject json = new JSONObject();
-    json.put("type","end_turn");
-    JSONObject args = new JSONObject();
-    json.put("args",args);
-    return json;
-  }
-  private JSONObject get_log_json ()
-  {
-    JSONObject json = new JSONObject();
-    json.put("type"," get_log");
-    JSONObject args = new JSONObject();
-    json.put("args",args);
-    return json;
-  }
-  
   public JSONObject receive ()
   {
     JSONObject message = new JSONObject(Utility.receive_string(serv_conn));
@@ -94,7 +54,7 @@ public class Game
   
   public boolean login ()
   {
-    Utility.send_string(serv_conn, login_json().toString());
+    Utility.send_string(serv_conn, Utility.login_json().toString());
     
     JSONObject result = wait_for(["success","failure"]);
     return (result.getString("type").equals("success"));
@@ -102,7 +62,7 @@ public class Game
   
   public boolean join_game ()
   {
-    Utility.send_string(serv_conn, join_game_json().toString());
+    Utility.send_string(serv_conn, Utility.join_game_json().toString());
     
     JSONObject result = wait_for(["success","failure"]);
     if (result.getString("type").equals("success"))
@@ -143,14 +103,14 @@ public class Game
       {
         Utility.v_print("Turn Number: " + ai.turn_number);
         ai.run();
-        Utility.send_string(serv_conn, end_turn_json().toString());
+        Utility.send_string(serv_conn, Utility.end_turn_json().toString());
       }      
     }
   }
   
   public void get_log ()
   {
-    Utility.send_string(serv_conn, get_log_json().toString());
+    Utility.send_string(serv_conn, Utility.get_log_json().toString());
     
     JSONObject result = wait_for(["success","failure"]);
     if (result.getString("type").equals("success"))
@@ -209,7 +169,7 @@ public class Game
     {
       ${model.name} newObject = new ${model.name}(serv_conn,this\
 % for datum in model.data:
-, values.get${type_convert(datum.type)}("${datum.name}")\
+, values.get${type_convert_java_json(datum.type)}("${datum.name}")\
 % endfor
 );
       ai.${lowercase(model.plural)}.add(newObject);
@@ -255,7 +215,7 @@ public class Game
 % for datum in model.data:
           if(change.getJSONObject("changes").has("${datum.name}"))
           {
-            ai.${lowercase(model.plural)}.get(i).${datum.name} = change.getJSONObject("changes").get${type_convert(datum.type)}("${datum.name}");
+            ai.${lowercase(model.plural)}.get(i).${datum.name} = change.getJSONObject("changes").get${type_convert_java_json(datum.type)}("${datum.name}");
           }
 % endfor
           return true;
@@ -271,7 +231,7 @@ public class Game
 % for datum in globals:
     if(change.getJSONObject("values").has("${datum.name}"))
     {
-      ai.${datum.name} = change.getJSONObject("values").get${type_convert(datum.type)}("${datum.name}");
+      ai.${datum.name} = change.getJSONObject("values").get${type_convert_java_json(datum.type)}("${datum.name}");
     }
 % endfor
     return true;
