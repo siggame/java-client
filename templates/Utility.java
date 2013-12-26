@@ -66,7 +66,7 @@ public class Utility
   public static JSONObject join_game_json ()
   {
     JSONObject json = new JSONObject();
-    json.put("type","join_game");
+    json.put("type", "join_game");
     JSONObject args = new JSONObject();
     if (game_name != null)
     {
@@ -78,7 +78,7 @@ public class Utility
   public static JSONObject end_turn_json ()
   {
     JSONObject json = new JSONObject();
-    json.put("type","end_turn");
+    json.put("type", "end_turn");
     JSONObject args = new JSONObject();
     json.put("args",args);
     return json;
@@ -86,10 +86,20 @@ public class Utility
   public static JSONObject get_log_json ()
   {
     JSONObject json = new JSONObject();
-    json.put("type"," get_log");
+    json.put("type", "get_log");
     JSONObject args = new JSONObject();
     json.put("args",args);
     return json;
   }
 
+  public static JSONObject function_call (String command, int player_id)
+  {
+    JSONObject json = new JSONObject();
+    json.put("type", ${repr(command)};
+    JSONObject args = new JSONObject();
+    args.put("actor", player_id);
+    json.put("args",args);
+    return json;
+  }
+  
 }
