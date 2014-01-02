@@ -97,9 +97,12 @@ public class ${model.name} inherits GameObject
   public ${relation.name} ${relation.name} ()
   {
     for (int i = 0; i < parent_game.ai.${lowercase(relation.plural)}.size(), i++)
+    {
       if (parent_game.ai.${lowercase(relation.plural)}.get(i).id == _${relation.name}_id)
       {
         return parent_game.ai.${lowercase(relation.plural)}.get(i);
       }
+    }
+    return null;
 % endfor
 }
