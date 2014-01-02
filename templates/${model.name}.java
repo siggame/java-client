@@ -16,8 +16,8 @@ public class ${model.name} inherits ${model.parent.name}
 % else:
 public class ${model.name} inherits GameObject
 {
-% for local in model.locals:
-  private ${type_convert_java_type(local.type)} _${local.name};
+% for datum in model.data:
+  private ${type_convert_java_type(datum.type)} _${datum.name};
 % endfor
 
   public ${model.name} (Socket connection, Game parent_game\
@@ -31,7 +31,7 @@ public class ${model.name} inherits GameObject
     _${datum.name} = ${datum.name};
 % endfor
 
-% for func in model.functions + model.properties:
+% for func in model.functions:
 //\
 // @fn ${func.name}
 % if func.doc:
@@ -81,12 +81,6 @@ public class ${model.name} inherits GameObject
   }
 
 % for local in model.locals:
-% if local.through:
-  public ${type_convert_java_type(local.type)} ${local.name} ()
-  {
-    return _${local.through}.${local.name}();
-  }
-% else:
   public ${type_convert_java_type(local.type)} ${local.name} ()
   {
     return _${local.name};
@@ -94,12 +88,18 @@ public class ${model.name} inherits GameObject
 % endif
 % endfor
 % for remote in model.remotes:
-  public ${remote.name} ${remote.name} ()
+  public ${type_convert_java_type(remote.type)} ${remote.name} ()
   {
-    for (int i = 0; i < parent_game.ai.${lowercase(remote.plural)}.size(), i++)
-      if (parent_game.ai.${lowercase(remote.plural)}.get(i).id == ${remote.name}_id)
+    return _${remote.through}.${remote.name}();
+  }
+% endfor
+% for relation in model.relations:
+  public ${relation.name} ${relation.name} ()
+  {
+    for (int i = 0; i < parent_game.ai.${lowercase(relation.plural)}.size(), i++)
+      if (parent_game.ai.${lowercase(relation.plural)}.get(i).id == _${relation.name}_id)
       {
-        return parent_game.ai.${lowercase(remote.plural)}.get(i);
+        return parent_game.ai.${lowercase(relation.plural)}.get(i);
       }
 % endfor
 }
