@@ -14,7 +14,7 @@ public class Game
     serv_conn = conn;
     game_name = name;
     ai = new AI();
-    //Don't know about this passing the connection to the ai business in the python template
+    ai.connection = conn;
   }
   
   public JSONObject receive ()

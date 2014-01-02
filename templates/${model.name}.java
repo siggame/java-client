@@ -1,5 +1,5 @@
 <%
-  rerun_for('model,models')
+  rerun_for('model',models)
 %>
 
 import java.net.*;
@@ -12,9 +12,9 @@ import org.json.*;
 % endif
 
 % if model.parent:
-public class ${model.name} inherits ${model.parent.name}
+public class ${model.name} extends ${model.parent.name}
 % else:
-public class ${model.name} inherits GameObject
+public class ${model.name} extends GameObject
 {
 % for datum in model.data:
   private ${type_convert_java_type(datum.type)} _${datum.name};
